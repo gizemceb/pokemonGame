@@ -144,7 +144,7 @@ const battle = {
 }
 
 function animate() {
-    window.requestAnimationFrame(animate)
+    const animationId = window.requestAnimationFrame(animate)
     background.draw()
     boundaries.forEach((boundry) => {
         boundry.draw()
@@ -174,7 +174,9 @@ function animate() {
                     rectange2: battleZone
                 }) && overlappingArea > (player.width * player.height) / 2 && Math.random() < 0.1)  {
                     
-                    console.log("battleZone")
+                    console.log("activate battle")
+                    // deactive current animation
+                    window.cancelAnimationFrame(animationId)
                     battle.initiated = true
                     player.moving = false
                     gsap.to('#overlappingDiv', {
@@ -185,9 +187,16 @@ function animate() {
                         onComplete() {
                             gsap.to('#overlappingDiv', {
                                 opacity: 1,
-                                duration: 0.4
+                                duration: 0.4,
+                                onComplete() {
+                                    // activate new animation
+                                    animateBattle()
+                                    gsap.to('#overlappingDiv', {
+                                        opacity: 0,
+                                        duration: 0.4,
+                                    })
+                                }
                             })
-                            // activate new animation
                         }
                     })
                     break
@@ -281,6 +290,21 @@ function animate() {
 }
 
 animate()
+
+const battleBackgroundImage = new Image()
+battleBackgroundImage.src = './images/battleBackground.png'
+const battleBackground = new Sprite({
+    position: {
+        x: 0,
+        y: 0
+    },
+    image: battleBackgroundImage
+})
+
+function animateBattle() {
+    window.requestAnimationFrame(animateBattle)
+    battleBackground.draw()
+}
 
 window.addEventListener('keydown', (e) => {
     switch(e.key) {
